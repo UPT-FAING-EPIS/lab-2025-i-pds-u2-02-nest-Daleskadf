@@ -1,4 +1,4 @@
-name: Publicar Documentación ACTIVIDAD 1
+name: Publicar Documentación de Laboratorio 02
 
 on:
   push:
@@ -22,38 +22,27 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies for CustomerApp
-        run: npm install && npm i -g @compodoc/compodoc
-        working-directory: ./customer-app
+      - name: Process 'customer-app'
+        run: |
+          echo "Procesando el proyecto customer-app..."
+          cd customer-app
+          npm install && npm i -g @compodoc/compodoc
+          npx @compodoc/compodoc -p tsconfig.json -d ../docs/customer-app
 
-      - name: Install dependencies for Notifications
-        run: npm install && npm i -g @compodoc/compodoc
-        working-directory: ./notifications
-
-      - name: Create root documentation directory
-        run: mkdir -p docs
-
-      - name: Generate documentation for CustomerApp
-        run: npx @compodoc/compodoc -p tsconfig.json -d ../docs/customer-app
-        working-directory: ./customer-app
-
-      - name: Generate documentation for Notifications
-        run: npx @compodoc/compodoc -p tsconfig.json -d ../docs/notifications
-        working-directory: ./notifications
+      - name: Process 'notifications'
+        run: |
+          echo "Procesando el proyecto notifications..."
+          cd notifications
+          npm install && npm i -g @compodoc/compodoc
+          npx @compodoc/compodoc -p tsconfig.json -d ../docs/notifications
 
       - name: Create main index.html
         run: |
-          echo '<!DOCTYPE html>' > docs/index.html
-          echo '<html>' >> docs/index.html
-          echo '<head><title>Documentación del Laboratorio</title></head>' >> docs/index.html
-          echo '<body>' >> docs/index.html
-          echo '<h1>Proyectos del Laboratorio</h1>' >> docs/index.html
-          echo '<ul>' >> docs/index.html
-          echo '<li><a href="customer-app/">Documentación de CustomerApp</a></li>' >> docs/index.html
-          echo '<li><a href="notifications/">Documentación de Notifications</a></li>' >> docs/index.html
-          echo '</ul>' >> docs/index.html
-          echo '</body>' >> docs/index.html
-          echo '</html>' >> docs/index.html
+          echo '<!DOCTYPE html><html><head><title>Documentación Lab 02</title><style>body{font-family:sans-serif;}</style></head><body>' > docs/index.html
+          echo '<h1>Laboratorio 02 - Patrones Estructurales</h1><ul>' >> docs/index.html
+          echo '<li><a href="customer-app/">Documentación de Patrón Facade (CustomerApp)</a></li>' >> docs/index.html
+          echo '<li><a href="notifications/">Documentación de Patrón Bridge (Notifications)</a></li>' >> docs/index.html
+          echo '</ul></body></html>' >> docs/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
