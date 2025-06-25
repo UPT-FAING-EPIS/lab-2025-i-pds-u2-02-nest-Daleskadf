@@ -1,0 +1,31 @@
+name: Crear Release ACTIVIDAD 3
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get current date
+        id: date
+        run: echo "TODAY=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: auto-release-${{ github.sha }}
+          release_name: Auto-Release Lab 02 - ${{ env.TODAY }}
+          body: |
+            Release del Laboratorio 02 generada automáticamente por un push a la rama main.
+            Commit: `${{ github.sha }}`
+          draft: false
+          prerelease: false
