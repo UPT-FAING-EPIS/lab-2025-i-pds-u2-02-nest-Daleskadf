@@ -1,0 +1,65 @@
+name: Publicar Documentación ACTIVIDAD 1
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for CustomerApp
+        run: npm install && npm i -g @compodoc/compodoc
+        working-directory: ./customer-app
+
+      - name: Install dependencies for Notifications
+        run: npm install && npm i -g @compodoc/compodoc
+        working-directory: ./notifications
+
+      - name: Create root documentation directory
+        run: mkdir -p docs
+
+      - name: Generate documentation for CustomerApp
+        run: npx @compodoc/compodoc -p tsconfig.json -d ../docs/customer-app
+        working-directory: ./customer-app
+
+      - name: Generate documentation for Notifications
+        run: npx @compodoc/compodoc -p tsconfig.json -d ../docs/notifications
+        working-directory: ./notifications
+
+      - name: Create main index.html
+        run: |
+          echo '<!DOCTYPE html>' > docs/index.html
+          echo '<html>' >> docs/index.html
+          echo '<head><title>Documentación del Laboratorio</title></head>' >> docs/index.html
+          echo '<body>' >> docs/index.html
+          echo '<h1>Proyectos del Laboratorio</h1>' >> docs/index.html
+          echo '<ul>' >> docs/index.html
+          echo '<li><a href="customer-app/">Documentación de CustomerApp</a></li>' >> docs/index.html
+          echo '<li><a href="notifications/">Documentación de Notifications</a></li>' >> docs/index.html
+          echo '</ul>' >> docs/index.html
+          echo '</body>' >> docs/index.html
+          echo '</html>' >> docs/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
